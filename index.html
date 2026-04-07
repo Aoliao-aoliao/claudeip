@@ -357,7 +357,7 @@ async function fetchIPCF() {
   return null;
 }
 
-// Fetch IP from ip138 (fallback)
+// Fetch IP from ip138
 async function fetchIP138() {
   try {
     const resp = await fetch('https://2026.ip138.com/', { signal: AbortSignal.timeout(8000) });
@@ -369,16 +369,46 @@ async function fetchIP138() {
   return null;
 }
 
+// Fetch IP from ip.cn
+async function fetchIPCN() {
+  try {
+    const resp = await fetch('https://my.ip.cn/', { signal: AbortSignal.timeout(8000) });
+    const text = await resp.text();
+    const ipMatch = text.match(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/);
+    const geoMatch = text.match(/归属地：(.+)/);
+    if (ipMatch) return { ip: ipMatch[1], geo: geoMatch ? geoMatch[1].trim() : '', source: 'IP.cn' };
+  } catch {}
+  return null;
+}
+
 // Display IP result with dedup logic
 async function runIPQuery() {
   const ipValueEl = document.getElementById('ipValue');
   const ipGeoEl = document.getElementById('ipGeo');
   const ipSourceEl = document.getElementById('ipSource');
 
-  // Try ip138 first (shows real domestic IP)
-  const ip138 = await fetchIP138();
-  if (ip138) {
-    await renderIPResult(ip138.ip, ip138.geo, ip138.source, ipValueEl, ipGeoEl, ipSourceEl);
+  const [r138, rCN] = await Promise.allSettled([fetchIP138(), fetchIPCN()]);
+  const ip138 = r138.status === 'fulfilled' ? r138.value : null;
+  const ipCN = rCN.status === 'fulfilled' ? rCN.value : null;
+
+  if (ip138 && ipCN) {
+    if (ip138.ip === ipCN.ip) {
+      const geo = ip138.geo.length >= ipCN.geo.length ? ip138.geo : ipCN.geo;
+      await renderIPResult(ip138.ip, geo, 'iP138.com / IP.cn', ipValueEl, ipGeoEl, ipSourceEl);
+    } else {
+      await renderIPResult(ip138.ip, ip138.geo, 'iP138.com', ipValueEl, ipGeoEl, ipSourceEl);
+      const card2 = document.createElement('div');
+      card2.className = 'ip-card';
+      card2.innerHTML = `<div class="label">IPv4 (备用出口)</div><div class="ip-value" id="ipValue2"></div><div class="ip-geo" id="ipGeo2"></div><div class="ip-source" id="ipSource2"></div>`;
+      document.getElementById('ipCard').after(card2);
+      await renderIPResult(ipCN.ip, ipCN.geo, 'IP.cn', document.getElementById('ipValue2'), document.getElementById('ipGeo2'), document.getElementById('ipSource2'));
+    }
+    return;
+  }
+
+  if (ip138 || ipCN) {
+    const r = ip138 || ipCN;
+    await renderIPResult(r.ip, r.geo, r.source, ipValueEl, ipGeoEl, ipSourceEl);
     return;
   }
 
