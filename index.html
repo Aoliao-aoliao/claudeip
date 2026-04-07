@@ -375,17 +375,17 @@ async function runIPQuery() {
   const ipGeoEl = document.getElementById('ipGeo');
   const ipSourceEl = document.getElementById('ipSource');
 
-  // Try Cloudflare Function first (always works, no GFW issue)
-  const cf = await fetchIPCF();
-  if (cf) {
-    await renderIPResult(cf.ip, cf.geo, cf.source, ipValueEl, ipGeoEl, ipSourceEl);
-    return;
-  }
-
-  // Fallback to ip138
+  // Try ip138 first (shows real domestic IP)
   const ip138 = await fetchIP138();
   if (ip138) {
     await renderIPResult(ip138.ip, ip138.geo, ip138.source, ipValueEl, ipGeoEl, ipSourceEl);
+    return;
+  }
+
+  // Fallback to Cloudflare Function
+  const cf = await fetchIPCF();
+  if (cf) {
+    await renderIPResult(cf.ip, cf.geo, cf.source, ipValueEl, ipGeoEl, ipSourceEl);
     return;
   }
 
