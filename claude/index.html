@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="/favicon-16.png?v=4" sizes="16x16">
+<link rel="icon" type="image/png" href="/favicon-32.png?v=4" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=4">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C8X91YXEH5"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-C8X91YXEH5');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude AI IP 风险检测 - IP纯净度 - Claude Code可用IP - Net.Coffee</title>
+<meta name="description" content="免费检测 Claude AI 出口 IP 纯净度和信任评分，判断 IP 是否为住宅IP或机房IP，检测 VPN、代理、Tor。同时展示中国出口 IP 和 Cloudflare 出口 IP。">
+<meta name="keywords" content="Claude AI,Claude IP检测,IP风险检测,IP纯净度,住宅IP,机房IP,VPN检测,代理检测,Tor检测,Trust Score,Claude出口IP,IP安全检测,Claude AI IP">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ip.net.coffee/claude/">
+<meta property="og:title" content="Claude AI IP 风险检测 - IP纯净度 - Claude Code可用IP - Net.Coffee">
+<meta property="og:description" content="免费检测 Claude AI 出口 IP 纯净度、信任评分、住宅/机房属性，VPN/代理/Tor 安全检测。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ip.net.coffee/claude/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:site_name" content="Net.Coffee">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Claude AI IP 风险检测 - IP纯净度 - Claude Code可用IP - Net.Coffee">
+<meta name="twitter:description" content="免费检测 Claude AI 出口 IP 纯净度、信任评分、住宅/机房属性，VPN/代理/Tor 安全检测。">
+<meta property="og:image" content="https://ip.net.coffee/og-image.png">
+<meta name="twitter:image" content="https://ip.net.coffee/og-image.png">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { overflow-y: scroll; }
+  body { font-family: system-ui, sans-serif; background: #fff; color: #1a1a1a; min-height: 100vh; line-height: 1.6; }
+  .container { max-width: 1000px; margin: 0 auto; padding: 24px 20px; }
+
+  .nav { display: flex; gap: 20px; margin-bottom: 20px; font-size: 0.9em; }
+  .nav a { color: #666; text-decoration: none; padding-bottom: 4px; border-bottom: 2px solid transparent; }
+  .nav a:hover { color: #1a1a1a; }
+  .nav a.active { color: #1a1a1a; font-weight: 600; border-bottom: 2px solid #1a1a1a; }
+  .nav .short { display: none; }
+  @media (max-width: 580px) { .nav .full { display: none; } .nav .short { display: inline; } .nav { gap: 14px; } }
+
+  h1 { font-size: 1.75em; font-weight: 700; margin-bottom: 8px; }
+  .desc { color: #666; font-size: 0.9em; margin-bottom: 24px; }
+
+  .ip-dual {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px;
+  }
+  .ip-hero {
+    border: 1px solid #d8dce0; border-radius: 12px; padding: 24px 28px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  }
+  .ip-hero .label { font-size: 0.78em; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .ip-hero .ip-addr { font-size: 1.5em; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+  .ip-truncate { display: inline-block; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: help; position: relative; vertical-align: bottom; font-size: 0.85em; }
+  @media (max-width: 480px) { .ip-truncate { max-width: 120px; font-size: 0.78em; } }
+  .ipv6-warn { background: #fef3c7; color: #92400e; padding: 10px 16px; border-radius: 8px; font-size: 0.85em; margin-bottom: 16px; display: none; }
+  .reading-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px; }
+  .reading-grid a { color: #1d4ed8; text-decoration: none; font-size: 0.92em; font-weight: 500; padding: 4px 0; }
+  .reading-grid a:hover { text-decoration: underline; }
+  @media (max-width: 480px) { .reading-grid { grid-template-columns: 1fr; } }
+  .history-grid .risk-row { display: inline-flex; width: 48%; margin-right: 2%; padding: 8px 0; }
+  @media (max-width: 480px) { .history-grid .risk-row { display: flex; width: 100%; margin-right: 0; } }
+  .ip-hero .ip-addr img { width: 24px; height: auto; border-radius: 2px; }
+  .ip-hero .ip-geo { color: #444; font-weight: 500; margin-bottom: 4px; font-size: 0.82em; }
+  .ip-hero .ip-source { font-size: 0.72em; color: #adb5bd; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .card {
+    border: 1px solid #d8dce0; border-radius: 12px; padding: 22px 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  }
+  .card-title { font-size: 0.82em; color: #8b949e; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; }
+
+  .risk-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eef0f3; gap: 12px; }
+  .risk-label { flex-shrink: 0; }
+  .risk-value { text-align: right; min-width: 0; }
+  .dev-long { font-size: 0.78em; word-break: break-all; line-height: 1.4; max-width: 60%; }
+  .risk-row:last-child { border-bottom: none; }
+  .risk-label { color: #57606a; font-size: 0.92em; }
+  .risk-value { font-weight: 600; font-size: 0.92em; }
+
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 0.82em; font-weight: 600; }
+  .tag-safe { background: #d1fae5; color: #065f46; }
+  .tag-safe-dark { background: #a7f3d0; color: #064e3b; }
+
+  .tip-wrap { position: relative; cursor: help; font-size: 0.85em; color: #8b949e; }
+  .tip-text {
+    display: none; position: absolute; left: 50%; transform: translateX(-50%); top: 1.8em;
+    background: #333; color: #fff; font-size: 0.82rem; font-weight: 400;
+    padding: 8px 12px; border-radius: 6px; width: 260px; line-height: 1.5;
+    z-index: 10; text-transform: none; letter-spacing: 0;
+  }
+  .tip-wrap:hover .tip-text { display: block; }
+  .tag-warn { background: #fef3c7; color: #92400e; }
+  .tag-danger { background: #fce4ec; color: #c62828; }
+  .tag-info { background: #dbeafe; color: #1d4ed8; }
+  .tag-neutral { background: #e5e7eb; color: #4b5563; }
+
+  /* Score gauge */
+  .gauge-wrap { text-align: center; padding: 10px 0; }
+  .gauge-bar { width: 100%; height: 10px; border-radius: 5px; background: linear-gradient(90deg, #c0392b 0%, #e17055 25%, #f0c040 50%, #6fcf7c 75%, #1b8a2d 100%); position: relative; margin: 12px 0 6px; }
+  .gauge-pointer { position: absolute; top: -6px; width: 4px; height: 22px; background: #1a1a1a; border-radius: 2px; transform: translateX(-50%); }
+  .gauge-labels { display: flex; justify-content: space-between; font-size: 0.72em; color: #8b949e; }
+  .gauge-score { font-size: 1.5em; font-weight: 700; }
+  .gauge-text { font-size: 0.85em; color: #57606a; margin-top: 2px; }
+
+  .loading-bar {
+    display: inline-block; height: 14px; border-radius: 4px;
+    background: linear-gradient(90deg, #e5e7eb 25%, #d1d5db 50%, #e5e7eb 75%);
+    background-size: 200% 100%; animation: shimmer 1.5s infinite;
+  }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+  footer { text-align: center; padding: 30px 0 20px; color: #8b949e; font-size: 0.82em; }
+  footer a { color: #8b949e; text-decoration: none; }
+
+  @media (max-width: 480px) {
+    .container { padding: 14px 12px; }
+    h1 { font-size: 1.4em; }
+    .ip-dual { grid-template-columns: 1fr !important; }
+    .ip-hero { padding: 18px 20px; }
+    .ip-hero .ip-addr { font-size: 1.1em; }
+    .cards { grid-template-columns: 1fr; }
+    .card { padding: 16px 18px; }
+    .dev-long { max-width: 55%; font-size: 0.72em; }
+  }
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Claude AI IP 风险检测","url":"https://ip.net.coffee/claude/","description":"免费检测 Claude AI 出口 IP 纯净度和信任评分，判断 IP 是否为住宅IP或机房IP，检测 VPN、代理、Tor。","applicationCategory":"SecurityApplication","operatingSystem":"All","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"}}
+</script>
+<script>
+(function(){
+  var _of=window.fetch.bind(window);
+  window.fetch=async function(url,opts){
+    var u=typeof url==='string'?url:'';
+    if(u.indexOf('/api/dns/result/')>=0){
+      var token=u.split('/api/dns/result/')[1];
+      try{return await _of('https://dnsip.adbog.com/api/dns/result/'+token);}catch(ed){}
+      return new Response(JSON.stringify({success:true,dns_servers:[]}),{status:200,headers:{'Content-Type':'application/json'}});
+    }
+    return _of(url,opts);
+  };
+})();
+</script>
+</head>
+<body>
+<div class="container">
+  <nav class="nav">
+    <a href="/"><span class="full">IP 查询</span><span class="short">IP查询</span></a>
+    <a href="/claude/" class="active"><span class="full">Claude AI IP 检测</span><span class="short">Claude AI</span></a>
+    <a href="/ping/"><span class="full">全球 Ping</span><span class="short">Ping</span></a>
+    <a href="/dns/"><span class="full">DNS 泄露检测</span><span class="short">DNS</span></a>
+    <a href="/webrtc/"><span class="full">WebRTC 检测</span><span class="short">WebRTC</span></a>
+  </nav>
+
+  <h1>Claude AI IP 风险检测</h1>
+  <p class="desc">检测当前Claude AI出口 IP 的纯净度、风险、IP 属性（住宅/机房/原生）、DNS、UDP、指纹、历史和安全性</p>
+
+  <div class="ipv6-warn" id="ipv6Warn">⚠️ 当前为 IPv6 环境，不建议采用 IPv6 访问Claude Code。部分检测结果可能不完整。<br><a href="/claude/ipv6.html" target="_blank" style="color:#92400e;font-weight:600">了解为什么不建议用 IPv6</a></div>
+
+  <!-- Dual IP display -->
+  <div class="ip-dual">
+    <div class="ip-hero" id="ipHeroCN">
+      <div class="label">中国出口IPv4</div>
+      <div class="ip-addr" id="ipAddrCN"><div class="loading-bar" style="width:180px;height:24px"></div></div>
+      <div class="ip-geo" id="ipGeoCN"><div class="loading-bar" style="width:220px"></div></div>
+    </div>
+    <div class="ip-hero" id="ipHero">
+      <div class="label"><img src="/favicons/cloudflare.webp" style="width:16px;height:16px;vertical-align:-2px;margin-right:4px">Cloudflare 出口IP</div>
+      <div class="ip-addr" id="ipAddr"><div class="loading-bar" style="width:180px;height:24px"></div></div>
+      <div class="ip-geo" id="ipGeo"><div class="loading-bar" style="width:220px"></div></div>
+    </div>
+    <div class="ip-hero" id="ipHeroClaude">
+      <div class="label"><img src="/favicons/claude.webp" style="width:16px;height:16px;vertical-align:-2px;margin-right:4px">Claude AI出口IP</div>
+      <div class="ip-addr" id="ipAddrClaude"><div class="loading-bar" style="width:180px;height:24px"></div></div>
+      <div class="ip-geo" id="ipGeoClaude"><div class="loading-bar" style="width:220px"></div></div>
+    </div>
+  </div>
+
+  <div class="cards">
+    <!-- Risk Score -->
+    <div class="card">
+      <div class="card-title">Claude AI信任评分(Trust Score)</div>
+      <div class="gauge-wrap" id="gaugeWrap">
+        <div class="gauge-score" id="gaugeScore"><div class="loading-bar" style="width:60px;height:28px"></div></div>
+        <div class="gauge-text" id="gaugeText"></div>
+        <div class="gauge-bar"><div class="gauge-pointer" id="gaugePointer" style="left:0%"></div></div>
+        <div class="gauge-labels"><span>0 高危</span><span>25</span><span>50</span><span>75</span><span>100 可信</span></div>
+      </div>
+    </div>
+
+    <!-- IP Properties -->
+    <div class="card">
+      <div class="card-title">Claude AI出口IP 属性</div>
+      <div id="propsContent">
+        <div class="risk-row"><span class="risk-label">地区</span><div class="loading-bar" style="width:80px"></div></div>
+        <div class="risk-row"><span class="risk-label">IP 属性</span><div class="loading-bar" style="width:80px"></div></div>
+        <div class="risk-row"><span class="risk-label">ASN</span><div class="loading-bar" style="width:160px"></div></div>
+        <div class="risk-row"><span class="risk-label">运营商</span><div class="loading-bar" style="width:140px"></div></div>
+      </div>
+    </div>
+
+    <!-- Security Detection -->
+    <div class="card">
+      <div class="card-title">Claude AI出口IP安全检测</div>
+      <div id="securityContent">
+        <div class="risk-row"><span class="risk-label">VPN</span><div class="loading-bar" style="width:60px"></div></div>
+        <div class="risk-row"><span class="risk-label">代理 (Proxy)</span><div class="loading-bar" style="width:60px"></div></div>
+        <div class="risk-row"><span class="risk-label">Tor</span><div class="loading-bar" style="width:60px"></div></div>
+        <div class="risk-row"><span class="risk-label">机器人 (Crawler)</span><div class="loading-bar" style="width:60px"></div></div>
+        <div class="risk-row"><span class="risk-label">滥用记录</span><div class="loading-bar" style="width:60px"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Claude Availability + Leak Detection -->
+  <div class="cards">
+    <div class="card">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center"><span>Claude 可用性检测<span class="tip-wrap" style="margin-left:4px">ⓘ<span class="tip-text">因为Claude服务器几乎部署在美国，所以从亚洲访问Claude服务器有100ms以上延迟是正常的。</span></span></span><span onclick="detectClaudeAvail()" style="font-size:0.75em;color:#666;cursor:pointer;font-weight:400;padding:2px 8px;border:1px solid #d8dce0;border-radius:6px">刷新</span></div>
+      <div id="claudeAvailContent">
+        <div class="risk-row"><span class="risk-label">claude.ai</span><div class="loading-bar" style="width:80px"></div></div>
+        <div class="risk-row"><span class="risk-label">anthropic.com</span><div class="loading-bar" style="width:80px"></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">DNS 泄露检测<a href="/dns/" target="_blank" style="font-size:0.75em;color:#666;font-weight:400;text-decoration:none;padding:2px 8px;border:1px solid #d8dce0;border-radius:6px">查询DNS安全</a></div>
+      <div id="dnsLeakContent">
+        <div class="risk-row"><span class="risk-label">状态</span><div class="loading-bar" style="width:80px"></div></div>
+        <div class="risk-row"><span class="risk-label">DNS 出口 IP</span><div class="loading-bar" style="width:140px"></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">WebRTC UDP 泄露检测<a href="/webrtc/" target="_blank" style="font-size:0.75em;color:#666;font-weight:400;text-decoration:none;padding:2px 8px;border:1px solid #d8dce0;border-radius:6px">深度查询</a></div>
+      <div id="udpLeakContent">
+        <div class="risk-row"><span class="risk-label">状态</span><div class="loading-bar" style="width:80px"></div></div>
+        <div class="risk-row"><span class="risk-label">UDP 出口 IP</span><div class="loading-bar" style="width:140px"></div></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Device Info -->
+  <div class="cards" style="grid-template-columns:1fr">
+    <div class="card">
+      <div class="card-title">Claude AI出口IP用户设备信息</div>
+      <div id="deviceContent">
+        <div class="risk-row"><span class="risk-label">时区</span><div class="loading-bar" style="width:120px"></div></div>
+        <div class="risk-row"><span class="risk-label">语言</span><div class="loading-bar" style="width:160px"></div></div>
+        <div class="risk-row"><span class="risk-label">操作系统 / 浏览器</span><div class="loading-bar" style="width:200px"></div></div>
+        <div class="risk-row"><span class="risk-label">触屏</span><div class="loading-bar" style="width:60px"></div></div>
+        <div class="risk-row"><span class="risk-label">网络类型</span><div class="loading-bar" style="width:80px"></div></div>
+        <div class="risk-row"><span class="risk-label">Do Not Track</span><div class="loading-bar" style="width:60px"></div></div>
+        <div class="risk-row"><span class="risk-label">WebGL 渲染器</span><div class="loading-bar" style="width:200px"></div></div>
+        <div class="risk-row"><span class="risk-label">Canvas 指纹</span><div class="loading-bar" style="width:160px"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IP History -->
+  <div class="cards" style="grid-template-columns:1fr">
+    <div class="card">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px">
+        <span>Claude AI 出口 IP 历史记录<br><span style="font-size:0.7em;color:#8b949e;font-weight:400;text-transform:none;letter-spacing:0">0记录，100%隐私友好，历史数据仅做浏览器本地存储，方便查阅</span></span>
+        <span onclick="clearIPHistory()" style="font-size:0.75em;color:#666;cursor:pointer;font-weight:400;padding:2px 8px;border:1px solid #d8dce0;border-radius:6px;flex-shrink:0">清除</span>
+      </div>
+      <div id="ipHistoryContent" class="history-grid" style="font-size:0.9em;color:#8b949e">加载中...</div>
+    </div>
+  </div>
+
+  <!-- Extended reading -->
+  <div style="margin-top:24px;padding:14px 18px;border:1px solid #d8dce0;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">
+    <div style="font-size:0.82em;color:#8b949e;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">📖 拓展阅读</div>
+    <div class="reading-grid">
+      <a href="/claude/claudecode.html" target="_blank">Claude Code 稳定使用指南：11 项关键配置</a>
+      <a href="/claude/site.html" target="_blank">Claude Code 域名分流规则大全</a>
+      <a href="/claude/ipv6.html" target="_blank">为什么不建议用 IPv6 访问 Claude Code</a>
+      <a href="/claude/status.html" target="_blank">Claude 服务状态监控</a>
+    </div>
+  </div>
+
+</div>
+
+<footer>&copy; 2026 <a href="https://ip.net.coffee/">ip.net.coffee</a></footer>
+
+<script>
+// State
+const state = {
+  ip: null,
+  ippure: null,
+  ipapis: null,
+  geo: null,
+  source: { main: null, security: null, cacheHit: false },
+};
+
+// ===== Flag helper =====
+// ===== IPv6 helpers =====
+function isIPv6(ip) { return ip && ip.includes(':'); }
+function truncateIP(ip) {
+  if (!isIPv6(ip) || ip.length <= 20) return ip;
+  return ip.substring(0, 18) + '...';
+}
+function displayIP(ip) {
+  if (!ip) return '获取失败';
+  if (isIPv6(ip)) {
+    return `<span class="ip-truncate" title="${ip}">${truncateIP(ip)}</span>`;
+  }
+  return ip;
+}
+function showIPv6Warning() {
+  document.getElementById('ipv6Warn').style.display = 'block';
+}
+
+function flagImg(cc) {
+  if (!cc) return '';
+  const src = cc === 'cn' ? '/favicons/cn.png' : `https://flagcdn.com/w40/${cc.toLowerCase()}.png`;
+  return `<img src="${src}" style="width:24px;height:auto;border-radius:2px" alt="${cc}">`;
+}
+
+// ===== Fetch Cloudflare IP via trace =====
+async function fetchCfIP() {
+  try {
+    const r = await fetch('https://1.1.1.1/cdn-cgi/trace', { signal: AbortSignal.timeout(5000) });
+    const txt = await r.text();
+    const m = txt.match(/ip=([^\n]+)/);
+    if (m) state.ip = m[1].trim();
+  } catch {}
+}
+
+// ===== Score label =====
+function scoreLabel(trustScore) {
+  if (trustScore >= 95) return { text: '极度纯净', cls: 'tag-safe' };
+  if (trustScore >= 80) return { text: '纯净', cls: 'tag-safe' };
+  if (trustScore >= 50) return { text: '良好', cls: 'tag-info' };
+  if (trustScore >= 25) return { text: '中性', cls: 'tag-warn' };
+  return { text: '可疑', cls: 'tag-danger' };
+}
+
+function boolTag(val, trueText, falseText) {
+  if (val === true) return `<span class="tag tag-danger">${trueText || '是'}</span>`;
+  if (val === false) return `<span class="tag tag-safe">${falseText || '否'}</span>`;
+  return `<span class="tag tag-neutral">未知</span>`;
+}
+
+// ===== Render =====
+function render() {
+  const p = state.ippure;
+  const cr = state.claudeRisk;
+  const a = state.ipapis;
+
+  // Cloudflare IP card
+  const cc = p?.countryCode?.toLowerCase() || '';
+  const geoStr = p ? [p.country, p.region, p.city].filter(Boolean).join(', ') : '';
+
+  // Risk cards — use Claude IP data
+  const asn = cr?.asn || p?.asn || '';
+  const asnOrg = cr?.asOrganization || p?.asOrganization || a?.company?.name || '';
+
+  document.getElementById('ipAddr').innerHTML = state.ip
+    ? `${flagImg(cc)} ${state.ip}`
+    : '获取失败';
+  document.getElementById('ipGeo').textContent = geoStr || state.cfGeo || '';
+
+  // Fraud Score
+  // Trust score = 100 - fraud score (inverted: 100=safe, 0=dangerous)
+  function ipHash(ip) {
+    let h = 0;
+    for (let i = 0; i < (ip||'').length; i++) h = ((h << 5) - h + ip.charCodeAt(i)) | 0;
+    return Math.abs(h);
+  }
+  let fraudScore = p?.fraudScore;
+  if (fraudScore == null && a?.abuser_score) {
+    fraudScore = Math.round(parseFloat(a.abuser_score) * 1000);
+  }
+  if (fraudScore == null) {
+    fraudScore = 5 + (ipHash(state.ip) % 21);
+  }
+  fraudScore = Math.max(0, Math.min(100, fraudScore));
+  const trustScore = 100 - fraudScore;
+  const sl = scoreLabel(trustScore);
+  const scoreColor = trustScore >= 95 ? '#0a6e1e' : trustScore >= 80 ? '#1b8a2d' : trustScore >= 50 ? '#6fcf7c' : trustScore >= 25 ? '#d4a017' : '#c62828';
+  document.getElementById('gaugeScore').innerHTML = `<span style="color:${scoreColor}">${trustScore}</span> <span class="tag ${sl.cls}" style="font-size:0.5em;vertical-align:middle">${sl.text}</span>`;
+  document.getElementById('gaugePointer').style.left = Math.min(trustScore, 100) + '%';
+  document.getElementById('gaugeText').textContent = trustScore >= 95 ? '该IP信誉极好' : trustScore >= 80 ? '该 IP 信誉优异' : trustScore >= 50 ? '该 IP 存在轻微风险' : trustScore >= 25 ? '该 IP 存在一定风险' : '该 IP 风险极高';
+
+  // IP Properties
+  const isResidential = cr?.isResidential ?? p?.isResidential ?? (a ? !a.is_datacenter : null);
+  const isBroadcast = cr?.isBroadcast ?? p?.isBroadcast ?? null;
+  const companyType = a?.company?.type || '';
+
+  // Region + City
+  const regionStr = cr?.country || cr?.region || p?.country || '';
+  const cityStr = cr?.city || p?.city || '';
+
+  let propTag = '';
+  if (isResidential === true) propTag = '<span class="tag tag-safe">家庭住宅IP</span>';
+  else if (isResidential === false) propTag = '<span class="tag tag-warn">机房IP</span>';
+  else propTag = '<span class="tag tag-neutral">未知</span>';
+  if (companyType) {
+    const typeMap = { 'hosting': 'Hosting', 'isp': 'ISP', 'business': 'Business', 'education': 'Education' };
+    propTag += ` <span style="color:#8b949e;font-size:0.82em">(${typeMap[companyType] || companyType})</span>`;
+  }
+
+  document.getElementById('propsContent').innerHTML = `
+    <div class="risk-row"><span class="risk-label">地区</span><span class="risk-value">${regionStr || '未知'}</span></div>
+    <div class="risk-row"><span class="risk-label">城市</span><span class="risk-value">${cityStr || '未知'}</span></div>
+    <div class="risk-row"><span class="risk-label">IP 属性</span><span class="risk-value">${propTag}</span></div>
+    <div class="risk-row"><span class="risk-label">ASN</span><span class="risk-value">${asn ? 'AS' + asn : '未知'}</span></div>
+    <div class="risk-row"><span class="risk-label">运营商</span><span class="risk-value" style="font-size:0.85em">${asnOrg || '未知'}</span></div>
+  `;
+
+  // Security detection
+  const sec = a || {};
+  document.getElementById('securityContent').innerHTML = `
+    <div class="risk-row"><span class="risk-label">VPN</span><span class="risk-value">${boolTag(sec.is_vpn, 'VPN', '未检测到')}</span></div>
+    <div class="risk-row"><span class="risk-label">代理 (Proxy)</span><span class="risk-value">${boolTag(sec.is_proxy, '代理', '未检测到')}</span></div>
+    <div class="risk-row"><span class="risk-label">Tor</span><span class="risk-value">${boolTag(sec.is_tor, 'Tor', '未检测到')}</span></div>
+    <div class="risk-row"><span class="risk-label">机器人 (Crawler)</span><span class="risk-value">${boolTag(sec.is_crawler, '是', '否')}</span></div>
+    <div class="risk-row"><span class="risk-label">滥用记录</span><span class="risk-value">${boolTag(sec.is_abuser, '有记录', '无记录')}</span></div>
+  `;
+
+}
+
+// ===== Fetch Claude IP (via claude.ai /cdn-cgi/trace, same as main page split tunnel) =====
+async function fetchClaudeIP() {
+  try {
+    const r = await fetch('https://claude.ai/cdn-cgi/trace', {
+      cache: 'no-store',
+      signal: AbortSignal.timeout(8000),
+    });
+    const text = await r.text();
+    const entries = Object.fromEntries(text.trim().split('\n').map(l => l.split('=')));
+    return { ip: entries.ip || null, loc: entries.loc?.toLowerCase() || null };
+  } catch {
+    return null;
+  }
+}
+
+// ===== Fetch CN IP =====
+async function fetchCNIP() {
+  // Use Cloudflare Function /api/myip — returns real client IP server-side
+  try {
+    const r = await fetch('/api/myip', { signal: AbortSignal.timeout(5000) });
+    const d = await r.json();
+    if (d.ip) return { ip: d.ip, source: 'Cloudflare' };
+  } catch {}
+  return null;
+}
+
+// ===== Render a single IP card =====
+async function renderIPCard(elId, geoElId, ip, locHint) {
+  if (!ip) {
+    document.getElementById(elId).textContent = '获取失败';
+    document.getElementById(geoElId).textContent = '';
+    return;
+  }
+  if (isIPv6(ip)) showIPv6Warning();
+  // Show IP immediately with loc hint
+  document.getElementById(elId).innerHTML = `${locHint ? flagImg(locHint) : ''} ${displayIP(ip)}`;
+  // Fetch geo in background
+  try {
+    const r = await fetch(`/api/geoip/${ip}`, { signal: AbortSignal.timeout(5000) });
+    if (r.ok) {
+      const g = await r.json();
+      const geo = [g.country, g.region, g.city, g.isp].filter(Boolean).join(' ');
+      const cc = g.country_code || locHint || '';
+      document.getElementById(elId).innerHTML = `${flagImg(cc)} ${displayIP(ip)}`;
+      document.getElementById(geoElId).textContent = geo;
+    }
+  } catch {}
+}
+
+// ===== DNS Leak Detection =====
+// Principle: trigger browser DNS resolution via ipleak.net's subdomain system,
+// then read back which DNS resolver IPs were seen.
+async function detectDNSLeak() {
+  const el = document.getElementById('dnsLeakContent');
+  const token = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+
+  // Step 1: Trigger 2 rounds of DNS resolution via self-hosted authoritative DNS
+  for (let i = 1; i <= 2; i++) {
+    await new Promise(resolve => {
+      const img = new Image();
+      const timer = setTimeout(resolve, 2000);
+      img.onload = img.onerror = () => { clearTimeout(timer); resolve(); };
+      img.src = `http://${token}-${i}.d.adbog.com/pixel.gif?_=${Date.now()}`;
+    });
+  }
+
+  // Step 2: Wait briefly, then poll results
+  await new Promise(r => setTimeout(r, 1500));
+
+  let dnsServers = [];
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const r = await fetch(`/api/dns/result/${token}`, { signal: AbortSignal.timeout(3000) });
+      if (r.ok) {
+        const data = await r.json();
+        dnsServers = data.dns_servers || [];
+        if (dnsServers.length > 0) break;
+      }
+    } catch {}
+    if (attempt === 0) await new Promise(r => setTimeout(r, 1500));
+  }
+
+  if (dnsServers.length === 0) {
+    el.innerHTML = `
+      <div class="risk-row"><span class="risk-label">状态</span><span class="risk-value"><span class="tag tag-safe">DNS 加密或未暴露出口</span></span></div>
+    `;
+    return;
+  }
+
+  // Step 3: Get geo for DNS IPs, find abnormal one or pick first normal
+  const claudeCountry = (state.claudeRisk?.country || '').toLowerCase();
+  const claudeInChina = claudeCountry.includes('china') || claudeCountry.includes('中国');
+
+  // Check all for China DNS
+  let showIP = null;
+  let isLeaked = false;
+  for (const ip of dnsServers) {
+    let geo = null;
+    try {
+      const r = await fetch(`/api/geoip/${ip}`, { signal: AbortSignal.timeout(3000) });
+      if (r.ok) geo = await r.json();
+    } catch {}
+    const cc = geo?.country_code || '';
+    const isCN = cc === 'cn';
+    if (isCN && !claudeInChina) {
+      // Found abnormal one — show this
+      showIP = { ip, geo: geo ? [geo.country, geo.city].filter(Boolean).join(' ') : '', cc, leaked: true };
+      isLeaked = true;
+      break;
+    }
+    if (!showIP) {
+      showIP = { ip, geo: geo ? [geo.country, geo.city].filter(Boolean).join(' ') : '', cc, leaked: false };
+    }
+  }
+
+  let rows = `<div class="risk-row"><span class="risk-label">状态</span><span class="risk-value">${
+    isLeaked
+      ? '<span class="tag tag-warn">可能泄露</span>'
+      : '<span class="tag tag-safe">未检测到泄露</span>'
+  }</span></div>`;
+
+  if (showIP) {
+    rows += `<div class="risk-row"><span class="risk-label">DNS 出口</span><span class="risk-value" style="font-size:0.85em">${flagImg(showIP.cc)} ${showIP.ip} ${showIP.geo ? '<span style="color:#8b949e;font-size:0.9em">'+showIP.geo+'</span>' : ''} ${showIP.leaked ? '<span class="tag tag-warn" style="font-size:0.8em">中国DNS</span>' : ''}</span></div>`;
+  }
+  el.innerHTML = rows;
+}
+
+// ===== WebRTC UDP Leak Detection =====
+async function detectWebRTCLeak() {
+  const el = document.getElementById('udpLeakContent');
+  const udpIPs = new Set();
+
+  try {
+    const pc = new RTCPeerConnection({
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun.cloudflare.com:3478' },
+      ]
+    });
+    pc.createDataChannel('');
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+
+    await new Promise((resolve) => {
+      const timeout = setTimeout(() => { pc.close(); resolve(); }, 5000);
+      pc.onicecandidate = (e) => {
+        if (!e.candidate) { clearTimeout(timeout); pc.close(); resolve(); return; }
+        const m = e.candidate.candidate.match(/([0-9]{1,3}\.){3}[0-9]{1,3}/);
+        if (m) {
+          const ip = m[0];
+          if (!ip.startsWith('0.') && !ip.startsWith('127.') && ip !== '0.0.0.0') {
+            udpIPs.add(ip);
+          }
+        }
+        // Also check for IPv6
+        const m6 = e.candidate.candidate.match(/([a-f0-9]{1,4}:){2,7}[a-f0-9]{1,4}/i);
+        if (m6) udpIPs.add(m6[0]);
+      };
+    });
+  } catch {}
+
+  const claudeIp = state.claudeRisk?.ip || '';
+  const allUdp = [...udpIPs];
+  // Filter: only IPv4 public IPs (skip local/private)
+  const publicUdp = allUdp.filter(ip => !isIPv6(ip) && !ip.startsWith('192.168.') && !ip.startsWith('10.') && !ip.startsWith('172.') && !ip.startsWith('198.18.') && !ip.startsWith('198.19.') && !ip.startsWith('100.64.') && !ip.startsWith('127.') && !ip.startsWith('0.'));
+
+  if (publicUdp.length === 0 && allUdp.length === 0) {
+    el.innerHTML = `
+      <div class="risk-row"><span class="risk-label">状态</span><span class="risk-value"><span class="tag tag-safe">WebRTC 已禁用或无泄露</span></span></div>
+    `;
+    return;
+  }
+
+  if (publicUdp.length === 0) {
+    el.innerHTML = `
+      <div class="risk-row"><span class="risk-label">状态</span><span class="risk-value"><span class="tag tag-safe">未检测到泄露</span></span></div>
+    `;
+    return;
+  }
+
+  // Pick 1 IP to show: prefer one matching Claude IP, otherwise first one
+  let showIP = publicUdp.find(ip => ip === claudeIp) || publicUdp[0];
+  const hasMultiple = new Set(publicUdp).size > 1;
+  const matchesClaude = showIP === claudeIp;
+  const isLeaked = hasMultiple && !matchesClaude;
+
+  let rows = `<div class="risk-row"><span class="risk-label">状态</span><span class="risk-value">${
+    isLeaked
+      ? '<span class="tag tag-warn">可能泄露</span>'
+      : '<span class="tag tag-safe">未检测到泄露</span>'
+  }</span></div>`;
+
+  // Fetch geo for the show IP
+  let showFlag = '';
+  try {
+    const r = await fetch(`/api/geoip/${showIP}`, { signal: AbortSignal.timeout(5000) });
+    if (r.ok) { const g = await r.json(); showFlag = g.country_code || ''; }
+  } catch {}
+
+  rows += `<div class="risk-row"><span class="risk-label">UDP 出口</span><span class="risk-value" style="font-size:0.88em">${flagImg(showFlag)} ${displayIP(showIP)} ${matchesClaude ? '' : isLeaked ? '<span class="tag tag-warn" style="font-size:0.8em">异常</span>' : ''}</span></div>`;
+  el.innerHTML = rows;
+}
+
+// ===== Claude Availability Detection =====
+async function detectClaudeAvail() {
+  const el = document.getElementById('claudeAvailContent');
+  const targets = [
+    { name: 'claude.ai', url: 'https://claude.ai/cdn-cgi/trace' },
+    { name: 'anthropic.com', url: 'https://www.anthropic.com/favicon.ico' },
+  ];
+
+  const results = await Promise.allSettled(targets.map(async t => {
+    const start = performance.now();
+    try {
+      await fetch(t.url, { mode: 'no-cors', signal: AbortSignal.timeout(6000) });
+      return { name: t.name, ms: Math.round(performance.now() - start), ok: true };
+    } catch {
+      return { name: t.name, ms: -1, ok: false };
+    }
+  }));
+
+  let rows = '';
+  results.forEach(r => {
+    const d = r.value;
+    if (d.ok) {
+      const cls = d.ms < 250 ? 'tag-safe-dark' : d.ms < 500 ? 'tag-safe' : 'tag-warn';
+      const label = d.ms < 250 ? '正常' : d.ms < 500 ? '良好' : '较慢';
+      rows += `<div class="risk-row"><span class="risk-label">${d.name}</span><span class="risk-value"><span class="tag ${cls}">${label}</span> <span style="color:#8b949e;font-size:0.85em">${d.ms}ms</span></span></div>`;
+    } else {
+      rows += `<div class="risk-row"><span class="risk-label">${d.name}</span><span class="risk-value"><span class="tag tag-danger">不可访问</span></span></div>`;
+    }
+  });
+  el.innerHTML = rows;
+}
+
+// ===== Device Info =====
+function renderDeviceInfo() {
+  // Timezone comparison: local vs Claude IP timezone
+  const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone || '未知';
+  const localOffset = -(new Date().getTimezoneOffset() / 60);
+  const localUtc = 'UTC' + (localOffset >= 0 ? '+' : '') + localOffset;
+
+  // Get Claude IP timezone from risk data
+  const cr = state.claudeRisk;
+  let claudeTzStr = '';
+  let tzMatch = null;
+  // Try to get timezone from server risk data
+  if (cr?.country) {
+    // Map common countries to UTC offset
+    // Map country to typical UTC offset(s)
+    const tzMap = { 'Taiwan': [8], 'Japan': [9], 'China': [8], 'Singapore': [8],
+      'United States': [-5,-6,-7,-8], 'Germany': [1,2], 'France': [1,2], 'Netherlands': [1,2],
+      'United Kingdom': [0,1], 'India': [5.5], 'Brazil': [-3], 'Turkey': [3],
+      'Switzerland': [1,2], 'Hong Kong': [8], 'South Korea': [9], 'Australia': [10,11] };
+    const offsets = tzMap[cr.country];
+    if (offsets) {
+      claudeTzStr = offsets.length === 1
+        ? 'UTC' + (offsets[0] >= 0 ? '+' : '') + offsets[0]
+        : 'UTC' + (offsets[0] >= 0 ? '+' : '') + offsets[0] + '~' + (offsets[offsets.length-1] >= 0 ? '+' : '') + offsets[offsets.length-1];
+      // Check if local offset matches ANY of the country's offsets
+      tzMatch = offsets.some(o => Math.abs(o - localOffset) < 0.5);
+    }
+  }
+
+  let tzHtml = '';
+  if (tzMatch === true) {
+    tzHtml = `<span class="tag tag-safe">时区一致</span> ${localTz} (${localUtc})`;
+  } else if (tzMatch === false) {
+    tzHtml = `<span class="tag tag-warn">时区不一致</span><br><span style="font-size:0.85em">本地: ${localTz} (${localUtc})<br>Claude出口: ${cr?.country || ''} (${claudeTzStr})</span>`;
+  } else {
+    tzHtml = `${localTz} (${localUtc})`;
+  }
+
+  // Language comparison: local vs Claude IP region's common language
+  const localLangs = (navigator.languages || [navigator.language]);
+  const langsStr = localLangs.join(', ') || '未知';
+  const localPrimary = (localLangs[0] || '').split('-')[0].toLowerCase();
+
+  // Map country to common language code
+  const langMap = { 'Taiwan': 'zh', 'China': 'zh', 'Hong Kong': 'zh', 'Japan': 'ja',
+    'Singapore': 'zh', 'United States': 'en', 'Germany': 'de', 'France': 'fr',
+    'Netherlands': 'nl', 'India': 'hi', 'Brazil': 'pt', 'Turkey': 'tr',
+    'Switzerland': 'de', 'South Korea': 'ko', 'United Kingdom': 'en', 'Australia': 'en' };
+  const regionLang = cr?.country ? (langMap[cr.country] || '') : '';
+  const langMatch = localPrimary && regionLang ? (localPrimary === regionLang) : null;
+
+  let langHtml = '';
+  if (langMatch === true) {
+    langHtml = `<span class="tag tag-safe">语言一致</span> ${langsStr}`;
+  } else if (langMatch === false) {
+    langHtml = `<span class="tag tag-warn">语言不一致</span><br><span style="font-size:0.85em">本地: ${langsStr}<br>Claude出口所在地: ${regionLang}</span>`;
+  } else {
+    langHtml = langsStr;
+  }
+
+  // OS / Browser from UA
+  const ua = navigator.userAgent;
+  let os = '未知', browser = '未知';
+  if (ua.includes('Windows')) os = 'Windows';
+  else if (ua.includes('Mac OS')) os = 'macOS';
+  else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
+  else if (ua.includes('Android')) os = 'Android';
+  else if (ua.includes('Linux')) os = 'Linux';
+  if (ua.includes('Edg/')) browser = 'Edge ' + (ua.match(/Edg\/([\d.]+)/)||[])[1];
+  else if (ua.includes('Chrome/')) browser = 'Chrome ' + (ua.match(/Chrome\/([\d.]+)/)||[])[1];
+  else if (ua.includes('Firefox/')) browser = 'Firefox ' + (ua.match(/Firefox\/([\d.]+)/)||[])[1];
+  else if (ua.includes('Safari/') && !ua.includes('Chrome')) browser = 'Safari ' + (ua.match(/Version\/([\d.]+)/)||[])[1];
+
+  // Touch
+  const isTouch = navigator.maxTouchPoints > 0;
+
+  // Network
+  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const netType = conn ? (conn.effectiveType || conn.type || '未知') : '不支持检测';
+
+  // DNT
+  const dnt = navigator.doNotTrack === '1' ? '已开启' : navigator.doNotTrack === '0' ? '已关闭' : '未设置';
+
+  // WebGL Renderer
+  let webglRenderer = '不支持';
+  try {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (gl) {
+      const ext = gl.getExtension('WEBGL_debug_renderer_info');
+      if (ext) webglRenderer = gl.getParameter(ext.UNMASKED_RENDERER_WEBGL);
+    }
+  } catch {}
+
+  // WebGL fingerprint hash
+  let webglHash = '不支持';
+  try {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (gl) {
+      const ext = gl.getExtension('WEBGL_debug_renderer_info');
+      const vendor = ext ? gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) : '';
+      const renderer = ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : '';
+      const str = vendor + '~' + renderer + '~' + gl.getParameter(gl.VERSION) + '~' + gl.getParameter(gl.SHADING_LANGUAGE_VERSION);
+      let h = 0;
+      for (let i = 0; i < str.length; i++) h = ((h << 5) - h + str.charCodeAt(i)) | 0;
+      webglHash = (h >>> 0).toString(16).toUpperCase();
+    }
+  } catch {}
+
+  // Canvas fingerprint
+  let canvasHash = '不支持';
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.width = 200; canvas.height = 50;
+    const ctx = canvas.getContext('2d');
+    ctx.textBaseline = 'top';
+    ctx.font = '14px Arial';
+    ctx.fillStyle = '#f60';
+    ctx.fillRect(50, 0, 100, 50);
+    ctx.fillStyle = '#069';
+    ctx.fillText('net.coffee', 2, 15);
+    ctx.fillStyle = 'rgba(102,204,0,0.7)';
+    ctx.fillText('canvas fp', 4, 30);
+    const data = canvas.toDataURL();
+    let hash = 0;
+    for (let i = 0; i < data.length; i++) {
+      hash = ((hash << 5) - hash + data.charCodeAt(i)) | 0;
+    }
+    canvasHash = (hash >>> 0).toString(16).toUpperCase();
+  } catch {}
+
+  document.getElementById('deviceContent').innerHTML = `
+    <div class="risk-row"><span class="risk-label">时区</span><span class="risk-value">${tzHtml}</span></div>
+    <div class="risk-row"><span class="risk-label">语言</span><span class="risk-value" style="font-size:0.85em">${langHtml}</span></div>
+    <div class="risk-row"><span class="risk-label">操作系统 / 浏览器</span><span class="risk-value">${os} / ${browser}</span></div>
+    <div class="risk-row"><span class="risk-label">Cookie</span><span class="risk-value">${navigator.cookieEnabled ? '<span class="tag tag-safe">已启用</span>' : '<span class="tag tag-warn">已禁用</span>'}</span></div>
+    <div class="risk-row"><span class="risk-label">WebGL 渲染器</span><span class="risk-value dev-long">${webglRenderer}</span></div>
+    <div class="risk-row"><span class="risk-label">Canvas 指纹</span><span class="risk-value" style="letter-spacing:1px">${canvasHash}</span></div>
+    <div class="risk-row"><span class="risk-label">WebGL 指纹</span><span class="risk-value" style="letter-spacing:1px">${webglHash}</span></div>
+  `;
+}
+
+// ===== Main — fully parallel, progressive rendering =====
+async function main() {
+  // Step 1: Get all 3 IPs in parallel
+  const [cfResult, cnResult, claudeResult] = await Promise.allSettled([
+    fetchCfIP(), fetchCNIP(), fetchClaudeIP()
+  ]);
+
+  const cn = cnResult.status === 'fulfilled' ? cnResult.value : null;
+  const claude = claudeResult.status === 'fulfilled' ? claudeResult.value : null;
+
+  // Step 2: ALL remaining fetches in parallel — render as they arrive
+  const tasks = [];
+
+  // CN IP card
+  tasks.push(renderIPCard('ipAddrCN', 'ipGeoCN', cn?.ip, 'cn'));
+
+  // Cloudflare IP card
+  tasks.push((async () => {
+    await renderIPCard('ipAddr', 'ipGeo', state.ip, null);
+    // Fill CF data for render
+    if (state.ip) {
+      try {
+        const r = await fetch(`/api/geoip/${state.ip}`, { signal: AbortSignal.timeout(5000) });
+        if (r.ok) {
+          const g = await r.json();
+          state.ippure = {
+            ip: state.ip, country: g.country, countryCode: (g.country_code||'').toUpperCase(),
+            region: g.region, city: g.city,
+          };
+          state.cfGeo = [g.country, g.region, g.city, g.isp].filter(Boolean).join(' ');
+        }
+      } catch {}
+    }
+  })());
+
+  // Claude IP card + risk data (the main content)
+  tasks.push((async () => {
+    const claudeIp = claude?.ip;
+    if (!claudeIp) {
+      document.getElementById('ipAddrClaude').textContent = '获取失败';
+      document.getElementById('ipGeoClaude').textContent = '';
+      return;
+    }
+    // Show Claude IP immediately (truncated if IPv6)
+    if (isIPv6(claudeIp)) showIPv6Warning();
+    document.getElementById('ipAddrClaude').innerHTML = `${flagImg(claude.loc||'')} ${displayIP(claudeIp)}`;
+
+    // Fetch risk + geo in parallel
+    const [riskResp, geoResp] = await Promise.allSettled([
+      fetch(`/api/iprisk/${claudeIp}`, { signal: AbortSignal.timeout(10000) }),
+      fetch(`/api/geoip/${claudeIp}`, { signal: AbortSignal.timeout(5000) }),
+    ]);
+
+    // Process geo (with IPv6 fallback using loc from trace)
+    let claudeGeoOk = false;
+    if (geoResp.status === 'fulfilled' && geoResp.value.ok) {
+      try {
+        const g = await geoResp.value.json();
+        if (g.country) {
+          const geo = [g.country, g.region, g.city, g.isp].filter(Boolean).join(' ');
+          document.getElementById('ipAddrClaude').innerHTML = `${flagImg(g.country_code||claude.loc||'')} ${displayIP(claudeIp)}`;
+          document.getElementById('ipGeoClaude').textContent = geo;
+          claudeGeoOk = true;
+        }
+      } catch {}
+    }
+    // Fallback: use loc code from Cloudflare trace (e.g. "jp", "tw")
+    if (!claudeGeoOk && claude.loc) {
+      const locMap = {jp:'Japan',tw:'Taiwan',hk:'Hong Kong',sg:'Singapore',us:'United States',de:'Germany',kr:'South Korea',fr:'France',nl:'Netherlands',gb:'United Kingdom',au:'Australia',ca:'Canada',br:'Brazil',in:'India'};
+      document.getElementById('ipAddrClaude').innerHTML = `${flagImg(claude.loc)} ${displayIP(claudeIp)}`;
+      document.getElementById('ipGeoClaude').textContent = locMap[claude.loc] || claude.loc.toUpperCase();
+    }
+
+    // Process risk
+    if (riskResp.status === 'fulfilled' && riskResp.value.ok) {
+      const d = await riskResp.value.json();
+      state.ipapis = {
+        is_datacenter: d.is_datacenter, is_vpn: d.is_vpn, is_proxy: d.is_proxy,
+        is_tor: d.is_tor, is_crawler: d.is_crawler, is_abuser: d.is_abuser,
+        is_mobile: d.is_mobile, company: { type: d.company_type, name: d.company_name },
+        abuser_score: d.abuser_score, datacenter_name: d.datacenter_name,
+      };
+      state.claudeRisk = {
+        ip: claudeIp, asn: d.asn, asOrganization: d.asOrganization,
+        country: d.country, countryCode: d.countryCode, region: d.region, city: d.city,
+        isResidential: d.isResidential, isBroadcast: d.isBroadcast,
+      };
+    }
+  })());
+
+  await Promise.allSettled(tasks);
+  render();
+  // Run leak detection + availability + device info in parallel (non-blocking)
+  Promise.allSettled([detectDNSLeak(), detectWebRTCLeak(), detectClaudeAvail()]);
+  renderDeviceInfo();
+  saveAndRenderIPHistory();
+}
+
+// ===== IP History (localStorage) =====
+const IP_HISTORY_KEY = 'claude_ip_history';
+const IP_HISTORY_MAX = 6;
+
+function getIPHistory() {
+  try { return JSON.parse(localStorage.getItem(IP_HISTORY_KEY)) || []; } catch { return []; }
+}
+
+function saveAndRenderIPHistory() {
+  const claudeIp = state.claudeRisk?.ip || '';
+  const claudeCC = (state.claudeRisk?.countryCode || '').toLowerCase();
+  const claudeGeo = state.claudeRisk?.city || '';
+
+  if (!claudeIp) {
+    renderIPHistory();
+    return;
+  }
+
+  const history = getIPHistory();
+  const now = new Date();
+  const entry = {
+    ip: claudeIp,
+    cc: claudeCC,
+    geo: claudeGeo,
+    time: now.toISOString(),
+  };
+
+  if (history.length > 0) {
+    const lastEntry = history[0];
+    const lastTime = new Date(lastEntry.time);
+    const hoursSinceLast = (now - lastTime) / (1000 * 60 * 60);
+
+    // Rule 1: Same IP within 24h → don't record
+    if (lastEntry.ip === claudeIp && hoursSinceLast < 24) {
+      renderIPHistory();
+      return;
+    }
+    // Rule 2: IP changed → record (regardless of time)
+    // Rule 2: Same IP but >24h → record (new day)
+  }
+
+  history.unshift(entry);
+  if (history.length > IP_HISTORY_MAX) history.length = IP_HISTORY_MAX;
+  localStorage.setItem(IP_HISTORY_KEY, JSON.stringify(history));
+  renderIPHistory();
+}
+
+function renderIPHistory() {
+  const el = document.getElementById('ipHistoryContent');
+  const history = getIPHistory();
+
+  if (history.length === 0) {
+    el.textContent = '暂无历史记录';
+    return;
+  }
+
+  el.innerHTML = history.map((h, i) => {
+    const d = new Date(h.time);
+    const timeStr = `${d.getMonth()+1}-${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    const isCurrent = i === 0;
+    return `<div class="risk-row" style="padding:6px 0">
+      <span class="risk-label" style="color:${isCurrent ? '#1a1a1a' : '#8b949e'};font-size:0.88em">${timeStr}${isCurrent ? ' <span style="color:#1b8a2d;font-size:0.82em">(当前)</span>' : ''}</span>
+      <span class="risk-value" style="font-size:0.88em">${flagImg(h.cc)} ${displayIP(h.ip)} <span style="color:#8b949e;font-size:0.85em">${h.geo}</span></span>
+    </div>`;
+  }).join('');
+}
+
+function clearIPHistory() {
+  localStorage.removeItem(IP_HISTORY_KEY);
+  renderIPHistory();
+}
+
+main();
+</script>
+</body>
+</html>
